@@ -1,0 +1,16 @@
+import 'package:flutter/cupertino.dart';
+
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoPageScaffold(
+      child: Column(
+        children: [
+          Text('Profile'),
+        ],
+      ),
+    );
+  }
+} 
