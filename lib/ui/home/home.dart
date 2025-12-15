@@ -44,6 +44,9 @@ class _MusicHomePageState extends State<MusicHomePage> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
+        leading: IconButton(onPressed: () {
+          Navigator.push(context, CupertinoPageRoute(builder: (context) => ProfilePage()));
+        }, icon: Icon(Icons.arrow_back_ios_new_rounded)),
         middle: Text('Music'),
         backgroundColor: Colors.blue,
       ),
@@ -214,7 +217,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
 class _SongItemSection extends StatelessWidget {
 
-  _SongItemSection({
+  const _SongItemSection({
     required this.song, required this.parent
     });
   final _HomeTabPageState parent;
