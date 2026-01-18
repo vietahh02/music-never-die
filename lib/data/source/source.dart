@@ -10,13 +10,15 @@ abstract interface class Source {
 class RemoteSource implements Source {
   @override
   Future<List<Song>?> fetchSongs() async {
-    final response = await http.get(Uri.parse('https://thantrieu.com/resources/braniumapis/songs.json'));
+    final response = await http.get(
+      Uri.parse('https://thantrieu.com/resources/braniumapis/songs.json'),
+    );
     if (response.statusCode == 200) {
       final String data = utf8.decode(response.bodyBytes);
       var songWapper = jsonDecode(data);
       var jsonData = songWapper['songs'] as List;
       return jsonData.map((song) => Song.fromJson(song)).toList();
-    }else {
+    } else {
       return null;
     }
   }

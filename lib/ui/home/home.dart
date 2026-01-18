@@ -84,7 +84,6 @@ class HomeTab extends StatelessWidget {
   }
 }
 
-
 class HomeTabPage extends StatefulWidget {
   const HomeTabPage({super.key});
 
