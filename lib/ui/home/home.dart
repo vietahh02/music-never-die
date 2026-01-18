@@ -16,7 +16,7 @@ class MyWidget extends StatelessWidget {
       title: 'Song App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
         useMaterial3: true,
       ),
       home: const MusicHomePage(),
@@ -26,7 +26,8 @@ class MyWidget extends StatelessWidget {
 }
 
 class MusicHomePage extends StatefulWidget {
-  const MusicHomePage({super.key});
+  const MusicHomePage({super.key, this.index = 0});
+  final int index;
 
   @override
   State<MusicHomePage> createState() => _MusicHomePageState();
@@ -45,7 +46,7 @@ class _MusicHomePageState extends State<MusicHomePage> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         leading: IconButton(onPressed: () {
-          Navigator.push(context, CupertinoPageRoute(builder: (context) => ProfilePage()));
+          Navigator.push(context, CupertinoPageRoute(builder: (context) => MusicHomePage(index: 2)));
         }, icon: Icon(Icons.arrow_back_ios_new_rounded)),
         middle: Text('Music'),
         backgroundColor: Colors.blue,
