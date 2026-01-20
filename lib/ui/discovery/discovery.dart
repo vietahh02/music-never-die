@@ -1,15 +1,14 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class DiscoveryPage extends StatelessWidget {
   const DiscoveryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      child: Column(
-        children: [
-          Text('Discovery'),
-        ],
+    return Scaffold(
+      appBar: AppBar(title: Text('Discovery')),
+      body: Center(
+        child: Text('Discovery'),
       ),
     );
   }

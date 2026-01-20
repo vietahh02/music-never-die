@@ -7,6 +7,8 @@ class Song {
   final String image;
   final int duration;
 
+  Song({required this.id, required this.title, required this.album, required this.artist, required this.source, required this.image, required this.duration});
+
   factory Song.fromJson(Map<String, dynamic> map) {
     return Song(
       id: map['id'],
@@ -22,10 +24,13 @@ class Song {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Song && runtimeType == other.runtimeType && id == other.id;
+      other is Song && runtimeType == other.runtimeType && id == other.id;
 
   @override
   int get hashCode => id.hashCode;
 
-  Song({required this.id, required this.title, required this.artist, required this.album, required this.duration, required this.image, required this.source});
+  @override
+  String toString() {
+    return 'Song(id: $id, title: $title, album: $album, artist: $artist, source: $source, image: $image, duration: $duration)';
+  }
 }
