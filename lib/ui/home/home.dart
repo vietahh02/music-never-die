@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:new_project/data/model/song.dart';
 import 'package:new_project/ui/discovery/discovery.dart';
+import 'package:new_project/ui/home/viewmodel.dart';
 import 'package:new_project/ui/settings/settings.dart';
 import 'package:new_project/ui/user/profile.dart';
 
@@ -41,7 +43,10 @@ class _MusicHomePageState extends State<MusicHomePage> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        leading: IconButton(onPressed: () {}, icon: Icon(CupertinoIcons.list_bullet)),
+        leading: IconButton(
+          onPressed: () {},
+          icon: Icon(CupertinoIcons.list_bullet),
+        ),
         middle: Text('Music App'),
       ),
       child: CupertinoTabScaffold(
@@ -77,11 +82,73 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return HomeTabPage();
+  }
+}
+
+class HomeTabPage extends StatefulWidget {
+  const HomeTabPage({super.key});
+
+  @override
+  State<HomeTabPage> createState() => _HomeTabPageState();
+}
+
+class _HomeTabPageState extends State<HomeTabPage> {
+  List<Song> songs = [];
+  late MusicHomeViewModel viewModel;
+
+  @override
+  void initState() {
+    viewModel = MusicHomeViewModel();
+    viewModel.loadSongs();
+    observeSongs();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Home')),
-      body: Center(
-        child: Text('Home'),
-      ),
+      body: getBody(),
     );
+  }
+
+  Widget getBody() {
+    bool showLoading = songs.isEmpty;
+    return showLoading ? getLoading() : getSong();
+  }
+
+  Widget getLoading() {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  Widget getSong() {
+    return ListView.separated(
+      itemBuilder: (context, index) => getSongItem(songs[index]),
+      separatorBuilder: (context, index) => Divider(
+        color: Colors.grey.shade300,
+        height: 1,
+        thickness: 1,
+        indent: 15,
+        endIndent: 15,
+      ),
+      itemCount: songs.length,
+      shrinkWrap: true,
+    );
+  }
+
+  Widget getSongItem(Song song) {
+    return ListTile(
+      title: Text(song.title),
+      subtitle: Text(song.artist),
+      leading: Image.network(song.image),
+    );
+  }
+
+  void observeSongs() {
+    viewModel.songsController.stream.listen((value) {
+      setState(() {
+        songs.addAll(value);
+      });
+    });
   }
 }

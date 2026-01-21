@@ -1,2 +1,4 @@
 Scaffold: tạo khung theo kiểu dành cho ứng dụng kiểu android
 CupertinoPageScaffold: tạo khung dành cho ứng dụng kiểu ios
+
+ListView.separated: hiển thị list có dòng phân cách giữa các phần tử
