@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:new_project/data/model/song.dart';
 import 'package:new_project/ui/discovery/discovery.dart';
 import 'package:new_project/ui/home/viewmodel.dart';
+import 'package:new_project/ui/now_playing/playing.dart';
 import 'package:new_project/ui/settings/settings.dart';
 import 'package:new_project/ui/user/profile.dart';
 
@@ -107,9 +108,13 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: getBody(),
-    );
+    return Scaffold(body: getBody());
+  }
+
+  @override
+  void dispose() {
+    viewModel.songsController.close();
+    super.dispose();
   }
 
   Widget getBody() {
@@ -140,7 +145,27 @@ class _HomeTabPageState extends State<HomeTabPage> {
     return ListTile(
       title: Text(song.title),
       subtitle: Text(song.artist),
-      leading: Image.network(song.image),
+      contentPadding: EdgeInsets.only(left: 15, right: 8),
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: FadeInImage(
+          width: 50,
+          height: 50,
+          placeholder: AssetImage('assets/placeholder.jpg'),
+          image: NetworkImage(song.image),
+          imageErrorBuilder: (context, error, stackTrace) => Image.asset('assets/placeholder.jpg'),
+          fit: BoxFit.cover,
+        ),
+      ),
+      trailing: IconButton(
+        onPressed: () => {
+          showBottomSheet(song),
+        },
+        icon: Icon(Icons.more_vert),
+      ),
+      onTap: () => {
+        navigate(song),
+      },
     );
   }
 
@@ -150,5 +175,37 @@ class _HomeTabPageState extends State<HomeTabPage> {
         songs.addAll(value);
       });
     });
+  }
+
+  void showBottomSheet(Song song) {
+    showModalBottomSheet(context: context, builder: (context) => 
+      ClipRRect(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        child: Container(
+          height: 400,
+          width: double.infinity,
+          color: Colors.amberAccent,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Bottom Sheet', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              ElevatedButton(onPressed: () => {
+                Navigator.pop(context),
+              }, child: Text('Close Bottom Sheet'))
+            ],
+          ),
+        ),
+      )
+    );
+  }
+
+  void navigate(Song song) {
+    Navigator.push(context, 
+      CupertinoPageRoute(builder: (context) => NowPlaying(
+        songs: songs,
+        playingSong: song,
+      ))
+    );
   }
 }

@@ -2,3 +2,26 @@ Scaffold: tạo khung theo kiểu dành cho ứng dụng kiểu android
 CupertinoPageScaffold: tạo khung dành cho ứng dụng kiểu ios
 
 ListView.separated: hiển thị list có dòng phân cách giữa các phần tử
+
+Expanded: Để cho những phần bên trong nó cso thể chiếm không gian còn lại và không bị đẩy ra ngoài
+SingleChildScrollView + scrollDirection: Axis.horizontal: để có thể scroll ngang nhưng phần bị tràn không hiển thị được
+StatefulWidget: hiển thị những thông tin có thể thay đổi trong tương lai
+StatelessWidget: hiển thị những thứ không thay đổi
+
+showDialog: là dialog confirm 
+ScaffoldMessenger: widget notification (SnackBar để custom giao diện và hiển thị mesage)
+ListView: hiển thị dưới dạng một danh sách
+ListTile: hiển thị đơn giản một dòng của list
+
+//#Button##########################################
+IconButton: button bằng icon
+ElevatedButton:
+InkWell:
+GestureDetector:
+
+//#Cut
+ClipRRect: cắt ra một hình chữ nhật để có thể hiển thị được các dữ liệu bên trong nó, chống tràn ra ngoài
+
+//#Image##############################################=
+Image: hiển thị Image bình thường
+FadeInImage: hiển thị image theo kiểu fade

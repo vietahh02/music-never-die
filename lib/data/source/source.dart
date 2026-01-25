@@ -13,7 +13,7 @@ class RemoteSongSource implements SongSource {
   @override
   Future<List<Song>?> getSongs() async {
     final response = await http.get(
-      Uri.parse('https://thantrieu.com/resources/braniumapis/songs.jso'),
+      Uri.parse('https://thantrieu.com/resources/braniumapis/songs.json'),
     );
     if (response.statusCode == 200) {
       final data = utf8.decode(response.bodyBytes);
