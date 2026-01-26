@@ -121,27 +121,12 @@ class _NowPlayingPageState extends State<NowPlayingPage>
               ),
               Padding(
                 padding: EdgeInsets.only(
-                  left: 10,
-                  right: 10,
+                  left: 30,
+                  right: 30,
                   top: 20,
                   bottom: 20,
                 ),
-                child: SizedBox(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.shuffle_outlined),
-                      ),
-                      // _progressBar(),
-                      IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.repeat_outlined),
-                      ),
-                    ],
-                  ),
-                ),
+                child: _progressBar(),
               ),
             ],
           ),
