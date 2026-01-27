@@ -1,6 +1,7 @@
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:new_project/data/model/song.dart';
 import 'package:new_project/ui/now_playing/audio_player_manager.dart';
 
@@ -39,7 +40,9 @@ class _NowPlayingPageState extends State<NowPlayingPage>
       duration: const Duration(seconds: 10),
       vsync: this,
     );
-    _audioPlayerManager = AudioPlayerManager(songUrl: widget.playingSong.source);
+    _audioPlayerManager = AudioPlayerManager(
+      songUrl: widget.playingSong.source,
+    );
     _audioPlayerManager.init();
   }
 
@@ -129,10 +132,7 @@ class _NowPlayingPageState extends State<NowPlayingPage>
                 child: _progressBar(),
               ),
               Padding(
-                padding: EdgeInsets.only(
-                  left: 30,
-                  right: 30,
-                ),
+                padding: EdgeInsets.only(left: 30, right: 30),
                 child: _mediaButtons(),
               ),
             ],
@@ -142,16 +142,43 @@ class _NowPlayingPageState extends State<NowPlayingPage>
     );
   }
 
+  @override
+  void dispose() {
+    _audioPlayerManager.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
   Widget _mediaButtons() {
     return SizedBox(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          MediaButtonController(function: () {}, icon: Icons.shuffle, color: Colors.grey, size: 24),
-          MediaButtonController(function: () {}, icon: Icons.skip_previous, color: Colors.black, size: 36),
-          MediaButtonController(function: () {}, icon: Icons.play_arrow, color: Colors.black, size: 48),
-          MediaButtonController(function: () {}, icon: Icons.skip_next, color: Colors.black, size: 36),
-          MediaButtonController(function: () {}, icon: Icons.repeat, color: Colors.grey, size: 24),
+          MediaButtonController(
+            function: () {},
+            icon: Icons.shuffle,
+            color: Colors.grey,
+            size: 24,
+          ),
+          MediaButtonController(
+            function: () {},
+            icon: Icons.skip_previous,
+            color: Colors.black,
+            size: 36,
+          ),
+          _playButton(),
+          MediaButtonController(
+            function: () {},
+            icon: Icons.skip_next,
+            color: Colors.black,
+            size: 36,
+          ),
+          MediaButtonController(
+            function: () {},
+            icon: Icons.repeat,
+            color: Colors.grey,
+            size: 24,
+          ),
         ],
       ),
     );
@@ -166,8 +193,8 @@ class _NowPlayingPageState extends State<NowPlayingPage>
         final buffered = durationState?.buffered ?? Duration.zero;
         final total = durationState?.total ?? Duration.zero;
         return ProgressBar(
-          progress: progress, 
-          buffered: buffered, 
+          progress: progress,
+          buffered: buffered,
           total: total,
           barHeight: 8,
           timeLabelTextStyle: TextStyle(fontSize: 12, color: Colors.grey),
@@ -178,12 +205,70 @@ class _NowPlayingPageState extends State<NowPlayingPage>
       },
     );
   }
+
+  StreamBuilder<PlayerState> _playButton() {
+    return StreamBuilder(
+      stream: _audioPlayerManager.player.playerStateStream,
+      builder: (context, snapshot) {
+        final playState = snapshot.data;
+        final progressingState = playState?.processingState;
+        final playing = playState?.playing;
+        if (progressingState == ProcessingState.loading 
+        || progressingState == ProcessingState.buffering) {
+          return Container(
+            margin: EdgeInsets.all(10),
+            width: 48,
+            height: 48,
+            child: CircularProgressIndicator(
+              color: Colors.blue,
+              strokeWidth: 2,
+            ),
+          );
+        }else if (playing != true) {
+          return MediaButtonController(
+            function: () {
+              _audioPlayerManager.player.play();
+              _controller.repeat();
+            },
+            icon: Icons.play_arrow,
+            color: Colors.blue,
+            size: 48,
+          );
+        }else if(progressingState != ProcessingState.completed) {
+          return MediaButtonController(
+            function: () {
+              _audioPlayerManager.player.pause();
+              _controller.stop();
+            },
+            icon: Icons.pause,
+            color: Colors.blue,
+            size: 48,
+          );
+        }else {
+          return MediaButtonController(
+            function: () {
+              _audioPlayerManager.player.seek(Duration.zero);
+            },
+            icon: Icons.replay,
+            color: Colors.blue,
+            size: 48,
+          );
+        }
+      },
+    );
+  }
 }
 
 class MediaButtonController extends StatefulWidget {
-  const MediaButtonController({super.key, required this.function, required this.icon, this.color, this.size});
+  const MediaButtonController({
+    super.key,
+    required this.function,
+    required this.icon,
+    this.color,
+    this.size,
+  });
 
-  final  void Function()? function;
+  final void Function()? function;
   final IconData icon;
   final Color? color;
   final double? size;
@@ -197,7 +282,11 @@ class _MediaButtonControllerState extends State<MediaButtonController> {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: widget.function,
-      icon: Icon(widget.icon, color: widget.color ?? Theme.of(context).colorScheme.primary, size: widget.size),
+      icon: Icon(
+        widget.icon,
+        color: widget.color ?? Theme.of(context).colorScheme.primary,
+        size: widget.size,
+      ),
     );
   }
 }

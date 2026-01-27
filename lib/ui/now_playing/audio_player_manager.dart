@@ -9,12 +9,21 @@ class AudioPlayerManager {
   AudioPlayerManager({required this.songUrl});
 
   void init() {
-    durationStateStream = Rx.combineLatest2<Duration, PlaybackEvent, DurationState>(
-      player.positionStream,
-      player.playbackEventStream,
-      (position, event) => DurationState(progress: position, buffered: event.bufferedPosition, total: event.duration),
-    );
+    durationStateStream =
+        Rx.combineLatest2<Duration, PlaybackEvent, DurationState>(
+          player.positionStream,
+          player.playbackEventStream,
+          (position, event) => DurationState(
+            progress: position,
+            buffered: event.bufferedPosition,
+            total: event.duration,
+          ),
+        );
     player.setUrl(songUrl);
+  }
+
+  void dispose() {
+    player.dispose();
   }
 }
 
