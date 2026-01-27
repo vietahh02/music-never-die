@@ -128,9 +128,31 @@ class _NowPlayingPageState extends State<NowPlayingPage>
                 ),
                 child: _progressBar(),
               ),
+              Padding(
+                padding: EdgeInsets.only(
+                  left: 30,
+                  right: 30,
+                ),
+                child: _mediaButtons(),
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _mediaButtons() {
+    return SizedBox(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          MediaButtonController(function: () {}, icon: Icons.shuffle, color: Colors.grey, size: 24),
+          MediaButtonController(function: () {}, icon: Icons.skip_previous, color: Colors.black, size: 36),
+          MediaButtonController(function: () {}, icon: Icons.play_arrow, color: Colors.black, size: 48),
+          MediaButtonController(function: () {}, icon: Icons.skip_next, color: Colors.black, size: 36),
+          MediaButtonController(function: () {}, icon: Icons.repeat, color: Colors.grey, size: 24),
+        ],
       ),
     );
   }
@@ -154,6 +176,28 @@ class _NowPlayingPageState extends State<NowPlayingPage>
           bufferedBarColor: Colors.blue.shade100,
         );
       },
+    );
+  }
+}
+
+class MediaButtonController extends StatefulWidget {
+  const MediaButtonController({super.key, required this.function, required this.icon, this.color, this.size});
+
+  final  void Function()? function;
+  final IconData icon;
+  final Color? color;
+  final double? size;
+
+  @override
+  State<MediaButtonController> createState() => _MediaButtonControllerState();
+}
+
+class _MediaButtonControllerState extends State<MediaButtonController> {
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: widget.function,
+      icon: Icon(widget.icon, color: widget.color ?? Theme.of(context).colorScheme.primary, size: widget.size),
     );
   }
 }

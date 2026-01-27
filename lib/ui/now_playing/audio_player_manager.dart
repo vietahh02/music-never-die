@@ -24,12 +24,4 @@ class DurationState {
   final Duration? total;
 
   DurationState({required this.progress, required this.buffered, this.total});
-
-  factory DurationState.fromJson(Map<String, dynamic> json) {
-    return DurationState(
-      progress: Duration(seconds: json['progress']),
-      buffered: Duration(seconds: json['buffered']),
-      total: json['total'] != null ? Duration(seconds: json['total']) : null,
-    );
-  }
 }
