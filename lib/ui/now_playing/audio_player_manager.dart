@@ -4,7 +4,7 @@ import 'package:rxdart/rxdart.dart';
 class AudioPlayerManager {
   final player = AudioPlayer();
   Stream<DurationState>? durationStateStream;
-  String songUrl;
+  late String songUrl;
 
   AudioPlayerManager({required this.songUrl});
 
@@ -24,6 +24,11 @@ class AudioPlayerManager {
 
   void dispose() {
     player.dispose();
+  }
+
+  void updateSongUrl(String songUrl) {
+    this.songUrl = songUrl;
+    player.setUrl(songUrl);
   }
 }
 

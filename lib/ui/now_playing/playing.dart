@@ -33,16 +33,21 @@ class _NowPlayingPageState extends State<NowPlayingPage>
     with TickerProviderStateMixin {
   late AnimationController _controller;
   late AudioPlayerManager _audioPlayerManager;
+  late int _selectItemIndex;
+  late Song _song;
+
   @override
   void initState() {
     super.initState();
+    _song = widget.playingSong;
     _controller = AnimationController(
       duration: const Duration(seconds: 10),
       vsync: this,
     );
     _audioPlayerManager = AudioPlayerManager(
-      songUrl: widget.playingSong.source,
+      songUrl: _song.source,
     );
+    _selectItemIndex = widget.songs.indexOf(widget.playingSong);
     _audioPlayerManager.init();
   }
 
@@ -65,7 +70,7 @@ class _NowPlayingPageState extends State<NowPlayingPage>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-              Text(widget.playingSong.album),
+              Text(_song.album),
               const SizedBox(height: 20),
               const Text('_ ___ _'),
               const SizedBox(height: 20),
@@ -77,7 +82,7 @@ class _NowPlayingPageState extends State<NowPlayingPage>
                     width: screenWidth - delta,
                     height: screenWidth - delta,
                     placeholder: AssetImage('assets/placeholder.jpg'),
-                    image: NetworkImage(widget.playingSong.image),
+                    image: NetworkImage(_song.image),
                     imageErrorBuilder: (context, error, stackTrace) =>
                         Image.asset(
                           'assets/placeholder.jpg',
@@ -106,10 +111,10 @@ class _NowPlayingPageState extends State<NowPlayingPage>
                       ),
                       Column(
                         children: [
-                          Text(widget.playingSong.title),
+                          Text(_song.title),
                           SizedBox(height: 8),
                           Text(
-                            widget.playingSong.artist,
+                            _song.artist,
                             style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ],
@@ -161,14 +166,18 @@ class _NowPlayingPageState extends State<NowPlayingPage>
             size: 24,
           ),
           MediaButtonController(
-            function: () {},
+            function: () {
+              _setPreviousSong();
+            },
             icon: Icons.skip_previous,
             color: Colors.black,
             size: 36,
           ),
           _playButton(),
           MediaButtonController(
-            function: () {},
+            function: () {
+              _setNextSong();
+            },
             icon: Icons.skip_next,
             color: Colors.black,
             size: 36,
@@ -246,6 +255,10 @@ class _NowPlayingPageState extends State<NowPlayingPage>
             size: 48,
           );
         }else {
+
+          if (progressingState == ProcessingState.completed) {
+            _controller.stop();
+          }
           return MediaButtonController(
             function: () {
               _audioPlayerManager.player.seek(Duration.zero);
@@ -258,6 +271,33 @@ class _NowPlayingPageState extends State<NowPlayingPage>
       },
     );
   }
+
+  void _setNextSong() {
+    _selectItemIndex++;
+    if (_selectItemIndex >= widget.songs.length) {
+      _selectItemIndex = 0;
+    }
+    final nextSong = widget.songs[_selectItemIndex];
+    _audioPlayerManager.updateSongUrl(nextSong.source);
+    _audioPlayerManager.player.play();
+    setState(() {
+      _song = nextSong;
+    });
+  }
+
+  void _setPreviousSong() {
+    _selectItemIndex--;
+    if (_selectItemIndex < 0) {
+      _selectItemIndex = widget.songs.length - 1;
+    }
+    final previousSong = widget.songs[_selectItemIndex];
+    _audioPlayerManager.updateSongUrl(previousSong.source);
+    _audioPlayerManager.player.play();
+    setState(() {
+      _song = previousSong;
+    });
+  }
+
 }
 
 class MediaButtonController extends StatefulWidget {
