@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:new_project/data/model/song.dart';
 import 'package:new_project/ui/discovery/discovery.dart';
 import 'package:new_project/ui/home/viewmodel.dart';
+import 'package:new_project/ui/now_playing/audio_player_manager.dart';
 import 'package:new_project/ui/now_playing/playing.dart';
 import 'package:new_project/ui/settings/settings.dart';
 import 'package:new_project/ui/user/profile.dart';
@@ -114,6 +115,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
   @override
   void dispose() {
     viewModel.songsController.close();
+    AudioPlayerManager().dispose();
     super.dispose();
   }
 

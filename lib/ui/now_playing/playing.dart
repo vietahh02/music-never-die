@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +37,8 @@ class _NowPlayingPageState extends State<NowPlayingPage>
   late AudioPlayerManager _audioPlayerManager;
   late int _selectItemIndex;
   late Song _song;
+  bool _isShuffle = false;
+  late LoopMode _loopMode;
 
   @override
   void initState() {
@@ -44,11 +48,17 @@ class _NowPlayingPageState extends State<NowPlayingPage>
       duration: const Duration(seconds: 10),
       vsync: this,
     );
-    _audioPlayerManager = AudioPlayerManager(
-      songUrl: _song.source,
-    );
+    _audioPlayerManager = AudioPlayerManager();
+    if (_audioPlayerManager.songUrl.compareTo(_song.source) != 0) {
+      _audioPlayerManager.updateSongUrl(_song.source);
+      _audioPlayerManager.prepare(isNewSong: true);
+    }
+    else {
+      _audioPlayerManager.prepare();
+    }
     _selectItemIndex = widget.songs.indexOf(widget.playingSong);
-    _audioPlayerManager.init();
+    _loopMode = LoopMode.off;
+    
   }
 
   @override
@@ -149,7 +159,6 @@ class _NowPlayingPageState extends State<NowPlayingPage>
 
   @override
   void dispose() {
-    _audioPlayerManager.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -160,9 +169,9 @@ class _NowPlayingPageState extends State<NowPlayingPage>
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           MediaButtonController(
-            function: () {},
+            function: _setShuffle,
             icon: Icons.shuffle,
-            color: Colors.grey,
+            color: _isShuffle ? Colors.blue : Colors.grey,
             size: 24,
           ),
           MediaButtonController(
@@ -183,9 +192,11 @@ class _NowPlayingPageState extends State<NowPlayingPage>
             size: 36,
           ),
           MediaButtonController(
-            function: () {},
-            icon: Icons.repeat,
-            color: Colors.grey,
+            function: () {
+              _setRepeating();
+            },
+            icon: _repeatingIcon(),
+            color: _loopMode == LoopMode.all || _loopMode == LoopMode.one ? Colors.blue : Colors.grey,
             size: 24,
           ),
         ],
@@ -223,8 +234,8 @@ class _NowPlayingPageState extends State<NowPlayingPage>
         final playState = snapshot.data;
         final progressingState = playState?.processingState;
         final playing = playState?.playing;
-        if (progressingState == ProcessingState.loading 
-        || progressingState == ProcessingState.buffering) {
+        if (progressingState == ProcessingState.loading ||
+            progressingState == ProcessingState.buffering) {
           return Container(
             margin: EdgeInsets.all(10),
             width: 48,
@@ -234,7 +245,7 @@ class _NowPlayingPageState extends State<NowPlayingPage>
               strokeWidth: 2,
             ),
           );
-        }else if (playing != true) {
+        } else if (playing != true) {
           return MediaButtonController(
             function: () {
               _audioPlayerManager.player.play();
@@ -244,7 +255,7 @@ class _NowPlayingPageState extends State<NowPlayingPage>
             color: Colors.blue,
             size: 48,
           );
-        }else if(progressingState != ProcessingState.completed) {
+        } else if (progressingState != ProcessingState.completed) {
           return MediaButtonController(
             function: () {
               _audioPlayerManager.player.pause();
@@ -254,8 +265,7 @@ class _NowPlayingPageState extends State<NowPlayingPage>
             color: Colors.blue,
             size: 48,
           );
-        }else {
-
+        } else {
           if (progressingState == ProcessingState.completed) {
             _controller.stop();
           }
@@ -273,13 +283,19 @@ class _NowPlayingPageState extends State<NowPlayingPage>
   }
 
   void _setNextSong() {
+    if (_isShuffle) {
+      _selectItemIndex = Random().nextInt(widget.songs.length);
+    } else {
     _selectItemIndex++;
+    }
     if (_selectItemIndex >= widget.songs.length) {
       _selectItemIndex = 0;
     }
     final nextSong = widget.songs[_selectItemIndex];
     _audioPlayerManager.updateSongUrl(nextSong.source);
     _audioPlayerManager.player.play();
+    _controller.reset();
+    _controller.repeat();
     setState(() {
       _song = nextSong;
     });
@@ -293,11 +309,33 @@ class _NowPlayingPageState extends State<NowPlayingPage>
     final previousSong = widget.songs[_selectItemIndex];
     _audioPlayerManager.updateSongUrl(previousSong.source);
     _audioPlayerManager.player.play();
+    _controller.reset();
+    _controller.repeat();
     setState(() {
       _song = previousSong;
     });
   }
 
+  void _setShuffle() {
+    setState(() {
+      _isShuffle = !_isShuffle;
+    });
+  }
+
+  IconData _repeatingIcon() {
+    return switch(_loopMode) {
+      LoopMode.all => Icons.repeat_on,
+      LoopMode.one => Icons.repeat_one,
+      LoopMode.off => Icons.repeat,
+    };
+  }
+
+  void _setRepeating() {
+      _loopMode = _loopMode == LoopMode.off ? LoopMode.all : _loopMode == LoopMode.all ? LoopMode.one : LoopMode.off;
+    setState(() {
+      _audioPlayerManager.player.setLoopMode(_loopMode);
+    });
+  }
 }
 
 class MediaButtonController extends StatefulWidget {

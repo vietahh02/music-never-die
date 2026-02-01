@@ -3,7 +3,6 @@ import 'package:new_project/ui/home/home.dart';
 // import 'package:new_project/ui/home/home.dart';
 
 void main() => runApp(const MusicApp());
-
 // void main() async {
 //   WidgetsFlutterBinding.ensureInitialized();
 //   var songRepository = SongRepositoryImpl();
@@ -14,3 +13,4 @@ void main() => runApp(const MusicApp());
 //     }
 //   }
 // }
+
